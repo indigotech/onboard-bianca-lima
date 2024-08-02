@@ -1,7 +1,5 @@
 const express = require('express')
 const { ApolloServer, gql} = require('apollo-server-express')
-const http = require("http");
-
 
 const app = express();
 
@@ -17,9 +15,8 @@ const resolvers = {
     }
 };
 
-let server = null;
+let server = new ApolloServer({ typeDefs:schema, resolvers });
 async function startServer (){    
-    server = new ApolloServer({ typeDefs:schema, resolvers });
     await server.start();
     server.applyMiddleware({ app });
 }
@@ -27,4 +24,3 @@ async function startServer (){
 startServer();
 
 app.listen({ port: 4000}, () => console.log(`Servidor rodando na porta localhost:4000${server.graphqlPath}`));
-

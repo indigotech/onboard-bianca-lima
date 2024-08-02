@@ -1,0 +1,17 @@
+{
+  "name": "onboard-bianca-lima",
+  "version": "1.0.0",
+  "description": "## Project's Description The Task Manager is an application that allows users to create, view, update, and delete tasks.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "3.13.0",
+    "express": "4.19.2",
+    "graphql": "16.9.0"
+  }
+}

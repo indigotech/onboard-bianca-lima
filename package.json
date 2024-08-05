@@ -1,25 +1,30 @@
 {
-  "name": "onboard-bianca-lima",
+  "name": "teste",
   "version": "1.0.0",
-  "description": "## Project's Description The Task Manager is an application that allows users to create, view, update, and delete tasks.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev --respawn src/index.ts"
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
-    "@types/node": "^22.1.0",
-    "apollo-server": "^3.13.0",
-    "apollo-server-express": "3.13.0",
-    "express": "4.19.2",
-    "graphql": "^16.9.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "@apollo/server": "4.10.5",
+    "graphql": "16.9.0"
   },
   "devDependencies": {
-    "ts-node-dev": "^2.0.0"
+    "@eslint/js": "9.8.0",
+    "@types/eslint__js": "8.42.3",
+    "@types/node": "22.1.0",
+    "eslint": "9.8.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "prettier": "3.3.3",
+    "typescript": "5.5.4",
+    "typescript-eslint": "8.0.0"
   }
 }

@@ -4,7 +4,7 @@
 The Task Manager is an application that allows users to create, view, update, and delete tasks.
 
 ## Environment and tools
-- Node.js
+- Node.js v22.2.0
 - Typescript
 - GraphQL
 - Express
@@ -24,7 +24,7 @@ The Task Manager is an application that allows users to create, view, update, an
 ```
 3. Run this Docker command:
 ```bash
-   docker-compose up -d
+   docker compose up -d
 ```
 4. Run the project:
 ```bash

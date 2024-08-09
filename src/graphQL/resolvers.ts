@@ -1,8 +1,21 @@
 import { PrismaClient } from '@prisma/client';
-import { scrypt, randomBytes } from 'crypto';
+import { scrypt as scryptAsync, randomBytes } from 'crypto';
+
 
 const prisma = new PrismaClient();
-const salt = randomBytes(32).toString("hex");
+const saltRounds = 16;
+const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
+
+function hashPassword(password: string, salt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    scryptAsync(password, salt, 64, (err, derivedKey) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(derivedKey.toString('hex'));
+    });
+  });
+}
 
 const resolvers = {
   Query: {
@@ -12,12 +25,8 @@ const resolvers = {
     createUser: async (parent, args) => {
       const { data } = args;
 
-      if (data.password.length < 6) {
-        throw new Error('Password must be at least 6 characters long');
-      }
-      
-      if (!/\d/.test(data.password) || !/[a-zA-Z]/.test(data.password)) {
-        throw new Error('Password must contain at least 1 letter and 1 digit');
+      if (!passwordRegex.test(data.password)) {
+        throw new Error('Password must be at least 6 characters long and contain at least 1 letter and 1 digit');
       }
 
       const existingUser = await prisma.user.findUnique({
@@ -28,11 +37,9 @@ const resolvers = {
         throw new Error('Email is already in use');
       }
 
-      const hashedPassword = await scrypt(data.password, salt, 64, (err, derivedKey)=>{
-        if(err) throw err;
-        console.log(derivedKey.toString());
-      });
-      
+      const salt = randomBytes(saltRounds).toString('hex');
+      const hashedPassword = await hashPassword(data.password, salt);
+
       const newUser = await prisma.user.create({
         data: {
           name: data.name,

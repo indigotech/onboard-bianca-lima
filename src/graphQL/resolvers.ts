@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import { scrypt, randomBytes } from 'crypto';
 
 const prisma = new PrismaClient();
-const saltRounds = 10;
+const salt = randomBytes(32).toString("hex");
 
 const resolvers = {
   Query: {
@@ -15,7 +15,7 @@ const resolvers = {
       if (data.password.length < 6) {
         throw new Error('Password must be at least 6 characters long');
       }
-
+      
       if (!/\d/.test(data.password) || !/[a-zA-Z]/.test(data.password)) {
         throw new Error('Password must contain at least 1 letter and 1 digit');
       }
@@ -28,7 +28,11 @@ const resolvers = {
         throw new Error('Email is already in use');
       }
 
-      const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+      const hashedPassword = await scrypt(data.password, salt, 64, (err, derivedKey)=>{
+        if(err) throw err;
+        console.log(derivedKey.toString());
+      });
+      
       const newUser = await prisma.user.create({
         data: {
           name: data.name,

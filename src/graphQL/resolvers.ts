@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { scrypt as scryptAsync, randomBytes } from 'crypto';
 
-
 const prisma = new PrismaClient();
 const saltRounds = 16;
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;

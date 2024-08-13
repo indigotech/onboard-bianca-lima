@@ -1,12 +1,16 @@
 {
     "compilerOptions": {
-      "rootDirs": ["./src"],
-      "outDir": "./dist",
+      "rootDirs": ["src"],
+      "outDir": "dist",
       "lib": ["es2020"],
       "target": "es2020",
       "module": "esnext",
       "moduleResolution": "node",
       "esModuleInterop": true,
-      "types": ["node"]
-    }
+      "types": ["node"] 
+    },
+    "ts-node": {
+      "esm": true
+    },
+    "include": ["src/**/*.ts", "test/**/*.ts"]
   }

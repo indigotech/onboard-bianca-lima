@@ -2,10 +2,11 @@ import { describe, it, before, after } from 'mocha';
 import { expect } from 'chai';
 import axios from 'axios';
 import { startServer, stopServer } from '../src/server.js';
+import * as dotenv from 'dotenv';
 
 let server;
 before(async () => {
-  server = await startServer();
+  server = await startServer(Number(process.env.PORT));
 });
 after(async () => {
   await stopServer(server);

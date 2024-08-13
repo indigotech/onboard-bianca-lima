@@ -8,9 +8,9 @@ const server = new ApolloServer({
   resolvers,
 });
 
-export const startServer = async () => {
+export const startServer = async (port: number) => {
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
+    listen: { port },
   });
   console.log(`Servidor rodando na porta ${url}`);
   return server;

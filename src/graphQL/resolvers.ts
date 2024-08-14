@@ -64,20 +64,19 @@ const resolvers = {
       if (!user) {
         throw CustomError.invalidCredentials();
       }
-
       const hashedPassword = await verifyPassword(data.password, user.password);
       if (!hashedPassword) {
         throw CustomError.invalidCredentials();
       }
 
       const expiresIn = args.rememberMe ? '1w' : '1h';
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
     
       return {
         user,
         token,
       };
-    }
+    },
   },
 };
 

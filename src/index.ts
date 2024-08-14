@@ -1,4 +1,4 @@
-import { startServer, stopServer } from './server.js';
+import { startServer } from './server.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();

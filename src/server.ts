@@ -13,7 +13,7 @@ export const startServer = async (port: number) => {
     listen: { port },
   });
   console.log(`Servidor rodando na porta ${url}`);
-  return server;
+  return { server, url };
 };
 
 export const stopServer = async (server: ApolloServer) => {

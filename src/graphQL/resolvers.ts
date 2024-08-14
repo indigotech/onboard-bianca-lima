@@ -52,19 +52,19 @@ const resolvers = {
       if (!user) {
         throw new CustomError(400, 'Invalid email or password', 'INVALID_CREDENTIALS');
       }
-
       const hashedPassword = await verifyPassword(data.password, user.password);
       if (!hashedPassword) {
         throw new CustomError(400, 'Invalid email or password', 'INVALID_CREDENTIALS');
       }
 
+      const expiresIn = args.rememberMe ? '1w' : '1h';
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
     
       return {
         user,
         token,
       };
-    }
+    },
   },
 };
 

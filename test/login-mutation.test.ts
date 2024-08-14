@@ -21,12 +21,13 @@ describe('Login Mutation', () => {
       },
     });
   });
-  it('should return a valid login response with mock data', async () => {
+
+  it('should login successfully with correct credentials', async () => {
     const loginMutation = `#graphql
     mutation {
       login(data: {
         email: "user@example.com", 
-        password: "senha123"
+        password: "senha123",
         }) {
         user {
           id
@@ -44,6 +45,34 @@ describe('Login Mutation', () => {
 
     expect(response.data.data.login).to.have.property('user');
     expect(response.data.data.login).to.have.property('token');
+    expect(response.data.data.login.user.name).to.equal('User Name');
+    expect(response.data.data.login.user.birthDate).to.equal('1990-04-25');
     expect(response.data.data.login.user.email).to.equal('user@example.com');
   });
+
+  it('should fail to login with incorrect credentials', async () => {
+    const loginMutation = `#graphql
+    mutation {
+      login(data: {
+        email: "wronguser@example.com", 
+        password: "wrongpassword123",
+        }) {
+        user {
+          id
+          name
+          email
+          birthDate
+        }
+        token
+      }
+    }
+    `;
+    try {
+      await axios.post(url, { query: loginMutation });
+    } catch (error: any) {
+      expect(error.response.data.errors[0].code).to.equal(400);
+      expect(error.response.data.errors[0].message).to.equal('Invalid email or password');
+    }
+  });
+
 });

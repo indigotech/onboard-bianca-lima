@@ -58,7 +58,7 @@ const resolvers = {
       }
 
       const expiresIn = args.rememberMe ? '1w' : '1h';
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn });
     
       return {
         user,

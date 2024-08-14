@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
@@ -20,6 +20,10 @@ describe('Login Mutation', () => {
         birthDate: '1990-04-25',
       },
     });
+  });
+
+  afterEach(async () => {
+    await prisma.user.deleteMany();
   });
 
   it('should login successfully with correct credentials', async () => {

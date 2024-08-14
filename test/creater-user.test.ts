@@ -44,6 +44,7 @@ describe('Create User Mutation', () => {
       where: { email: 'bia@example.com' },
     });
     expect(userInDb).to.not.be.null;
+    expect(userInDb!.id).to.equal(Number(response.data.data.createUser.id));
     expect(userInDb!.name).to.equal('bia');
     expect(userInDb!.email).to.equal('bia@example.com');
     expect(userInDb!.birthDate).to.equal('1990-01-01');

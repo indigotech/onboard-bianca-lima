@@ -7,6 +7,9 @@ let server;
 before(async () => {
   server = await startServer(Number(process.env.PORT));
 });
+
+import('./creater-user.test.js');
+
 after(async () => {
   await stopServer(server.server);
 });

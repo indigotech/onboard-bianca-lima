@@ -17,8 +17,14 @@ type User {
   birthDate: String!
 }
 
+type Login {
+  user: User!
+  token: String!
+}
+
 type Mutation {
   createUser(data: UserInput!): User!
+  login(email: String!, password: String!): Login!
 }
 `;
 

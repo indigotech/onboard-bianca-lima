@@ -18,14 +18,14 @@ const resolvers = {
       const { data } = args;
 
       if (!context.headers.authorization) {
-        throw new CustomError(401, 'No token provided', 'Authentication required');
+        throw CustomError.authenticationRequired();
       }
 
       const token = context.headers.authorization.split(' ')[1];
       try {
         await verifyToken(token); 
       } catch {
-        throw new CustomError(401, 'Invalid token', 'Authentication failed');
+        throw CustomError.authenticationFalied();
       }
 
       if (!passwordRegex.test(data.password)) {
@@ -54,7 +54,7 @@ const resolvers = {
     login: async (parent, args) => {
       const { data } = args;
       if (!data.email) {
-        throw new CustomError(400, 'Email is required', 'MISSING_EMAIL');
+        throw CustomError.invalidCredentials();
       }
 
       const user = await prisma.user.findUnique({ 
@@ -62,11 +62,12 @@ const resolvers = {
       });
 
       if (!user) {
-        throw new CustomError(400, 'Invalid email or password', 'INVALID_CREDENTIALS');
+        throw CustomError.invalidCredentials();
       }
+
       const hashedPassword = await verifyPassword(data.password, user.password);
       if (!hashedPassword) {
-        throw new CustomError(400, 'Invalid email or password', 'INVALID_CREDENTIALS');
+        throw CustomError.invalidCredentials();
       }
 
       const expiresIn = args.rememberMe ? '1w' : '1h';
@@ -76,7 +77,7 @@ const resolvers = {
         user,
         token,
       };
-    },
+    }
   },
 };
 

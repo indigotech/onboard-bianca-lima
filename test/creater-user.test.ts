@@ -50,4 +50,67 @@ describe('Create User Mutation', () => {
     expect(userInDb!.email).to.equal('bia@example.com');
     expect(userInDb!.birthDate).to.equal('1990-01-01');
   });
+
+  it('should return an error if the email is already taken', async () => {      
+    await prisma.user.create({
+      data: {
+        name: "Existing User",
+        email: "existing@example.com",
+        password: "Test1234!",
+        birthDate: "1990-01-01",
+      },
+    });
+    
+    const createUserMutation = `#graphql
+      mutation {
+        createUser(data: {
+          name: "Existing User",
+          email: "existing@example.com",
+          password: "senha123",
+          birthDate: "1990-01-01"
+        }) {
+          id
+          name
+          email
+          birthDate
+        }
+      }
+    `;
+
+    try{
+      const response = await axios.post(url, {
+        query: createUserMutation,
+      });  
+    }catch (error){
+      expect(error.response.data.errors[0].message).to.equal('Email is already in use');
+      expect(error.response.data.errors[0].code).to.equal(409);
+    }
+  });
+
+  it('should return an error if the password is weak', async () => {
+    const createUserMutation = `#graphql
+      mutation {
+        createUser(data: {
+          name: "Existing User",
+          email: "existing@example.com",
+          password: "senha",
+          birthDate: "1990-01-01"
+        }) {
+          id
+          name
+          email
+          birthDate
+        }
+      }
+    `;
+
+    try {
+      await axios.post(url, {
+        query: createUserMutation,
+      });
+    } catch (error) {
+      expect(error.response.data.errors[0].message).to.equal('Password does not meet security requirements');
+      expect(error.response.data.errors[0].code).to.equal(400);
+    }
+  });
 });

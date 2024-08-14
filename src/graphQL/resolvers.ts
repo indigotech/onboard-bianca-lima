@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { scrypt as scryptAsync, randomBytes } from 'crypto';
-import { CustomError } from '../errors/customError.js';
+import { CustomError } from '../errors/custom-error.js';
 
 const prisma = new PrismaClient();
 const saltRounds = 16;

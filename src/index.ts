@@ -3,4 +3,4 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const server = await startServer(Number(process.env.PORT));
+await startServer(Number(process.env.PORT));

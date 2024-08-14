@@ -8,8 +8,6 @@ before(async () => {
   server = await startServer(Number(process.env.PORT));
 });
 
-import('./creater-user.test.js');
-
 after(async () => {
   await stopServer(server.server);
 });
@@ -23,6 +21,7 @@ describe('Apollo Server', () => {
         }
       `,
     });
+
     const data = response.data;
     expect(data).to.have.property('data');
     expect(data.data.hello).to.equal('Hello, World!');

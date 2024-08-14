@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "NODE_OPTIONS='--loader ts-node/esm' mocha",
+    "test": "NODE_OPTIONS='--loader ts-node/esm' DOTENV_CONFIG_PATH=test.env mocha",
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
     "dev": "nodemon"
@@ -16,6 +16,7 @@
   "dependencies": {
     "@apollo/server": "4.10.5",
     "@prisma/client": "5.18.0",
+    "dotenv": "16.4.5",
     "graphql": "16.9.0"
   },
   "devDependencies": {

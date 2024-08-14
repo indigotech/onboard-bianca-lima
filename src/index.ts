@@ -1,3 +1,6 @@
-import { startServer, stopServer } from './server.js';
+import { startServer } from './server.js';
+import * as dotenv from 'dotenv';
 
-const server = await startServer();
+dotenv.config();
+
+await startServer(Number(process.env.PORT));

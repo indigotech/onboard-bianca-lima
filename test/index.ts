@@ -5,21 +5,23 @@ import { startServer, stopServer } from '../src/server.js';
 
 let server;
 before(async () => {
-  server = await startServer();
+  server = await startServer(Number(process.env.PORT));
 });
+
 after(async () => {
-  await stopServer(server);
+  await stopServer(server.server);
 });
 
 describe('Apollo Server', () => {
   it('should return "Hello world!"', async () => {
-    const response = await axios.post('http://localhost:4001', {
+    const response = await axios.post(server.url, {
       query: `
         query {
           hello
         }
       `,
     });
+
     const data = response.data;
     expect(data).to.have.property('data');
     expect(data.data.hello).to.equal('Hello, World!');

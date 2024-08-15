@@ -1,4 +1,4 @@
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
@@ -11,6 +11,10 @@ const url = `http://localhost:${process.env.PORT}`;
 let validToken = jwt.sign({ userId: 1 }, JWT_SECRET, { expiresIn: '1h' });
 
 describe('User Query', () => {
+  beforeEach(async () => {
+    await prisma.user.deleteMany();
+  });
+
   it('should return user data for a valid ID', async () => {
     const user = await prisma.user.create({
         data: {

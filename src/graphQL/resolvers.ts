@@ -13,13 +13,13 @@ const resolvers = {
       const { id } = args;
       
       if (!context.headers.authorization) {
-        throw new CustomError(401, 'No token provided', 'Authentication required');
+        throw CustomError.authenticationRequired();
       }
       const token = context.headers.authorization.split(' ')[1];
       try {
         await verifyToken(token); 
       } catch {
-        throw new CustomError(401, 'Invalid token', 'Authentication failed');
+        throw CustomError.authenticationFalied();
       }
 
       const user = await prisma.user.findUnique({
@@ -27,7 +27,7 @@ const resolvers = {
       });
 
       if (!user) {
-        throw new CustomError(404, 'User not found', 'Invalid user ID');
+        throw CustomError.userNotFound();
       }
       return user;
     },

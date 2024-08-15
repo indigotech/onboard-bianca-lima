@@ -45,4 +45,14 @@ export class CustomError {
       },
     });
   }
+
+  static userNotFound() {
+    return new GraphQLError('User not found', {
+      extensions: {
+        additionalInfo: 'Invalid user ID',
+        code: 'BAD_USER_INPUT',
+      },
+    });
+  }
+
 }

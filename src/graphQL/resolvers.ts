@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { scrypt as scryptAsync, randomBytes } from 'crypto';
+import { CustomError } from '../errors/custom-error.js';
 
 const prisma = new PrismaClient();
 const saltRounds = 16;
@@ -25,7 +26,7 @@ const resolvers = {
       const { data } = args;
 
       if (!passwordRegex.test(data.password)) {
-        throw new Error('Password must be at least 6 characters long and contain at least 1 letter and 1 digit');
+        throw CustomError.unsecurityPassword();
       }
 
       const existingUser = await prisma.user.findUnique({
@@ -33,7 +34,7 @@ const resolvers = {
       });
 
       if (existingUser) {
-        throw new Error('Email is already in use');
+        throw CustomError.emailInUse();
       }
 
       const salt = randomBytes(saltRounds).toString('hex');

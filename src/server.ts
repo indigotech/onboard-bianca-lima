@@ -2,6 +2,7 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import typeDefs from './graphql/type-defs.js';
 import resolvers from './graphql/resolvers.js';
+import { CustomError } from './errors/custom-error.js';
 
 const server = new ApolloServer({
   typeDefs,

@@ -77,14 +77,13 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    try{
-      const response = await axios.post(url, {
-        query: createUserMutation,
-      });  
-    }catch (error){
-      expect(error.response.data.errors[0].message).to.equal('Email is already in use');
-      expect(error.response.data.errors[0].code).to.equal(409);
-    }
+    
+    const response = await axios.post(url, {
+      query: createUserMutation,
+    });
+    
+    expect(response.data.errors[0].message).to.equal('Email is already in use');
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');  
   });
 
   it('should return an error if the password is weak', async () => {
@@ -104,13 +103,11 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    try {
-      await axios.post(url, {
-        query: createUserMutation,
-      });
-    } catch (error) {
-      expect(error.response.data.errors[0].message).to.equal('Password does not meet security requirements');
-      expect(error.response.data.errors[0].code).to.equal(400);
-    }
+    const response = await axios.post(url, {
+      query: createUserMutation,
+    });
+
+    expect(response.data.errors[0].message).to.equal('Password does not meet security requirements');
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
   });
 });

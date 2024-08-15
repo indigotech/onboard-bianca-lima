@@ -9,6 +9,28 @@ const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
 const resolvers = {
   Query: {
     hello: () => 'Hello, World!',
+    user: async (parent, args, context) => {
+      const { id } = args;
+      
+      if (!context.headers.authorization) {
+        throw new CustomError(401, 'No token provided', 'Authentication required');
+      }
+      const token = context.headers.authorization.split(' ')[1];
+      try {
+        await verifyToken(token); 
+      } catch {
+        throw new CustomError(401, 'Invalid token', 'Authentication failed');
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: Number(id) },
+      });
+
+      if (!user) {
+        throw new CustomError(404, 'User not found', 'Invalid user ID');
+      }
+      return user;
+    },
   },
   Mutation: {
     createUser: async (parent, args, context) => {
@@ -17,7 +39,6 @@ const resolvers = {
       if (!context.headers.authorization) {
         throw CustomError.authenticationRequired();
       }
-
       const token = context.headers.authorization.split(' ')[1];
       try {
         await verifyToken(token);

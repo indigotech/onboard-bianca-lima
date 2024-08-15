@@ -74,7 +74,7 @@ describe('Login Mutation', () => {
     try {
       await axios.post(url, { query: loginMutation });
     } catch (error: any) {
-      expect(error.response.data.errors[0].code).to.equal(400);
+      expect(error.response.data.errors[0].code).to.equal('BAD_USER_INPUT');
       expect(error.response.data.errors[0].message).to.equal('Invalid email or password');
     }
   });

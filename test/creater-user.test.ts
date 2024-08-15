@@ -39,7 +39,7 @@ describe('Create User Mutation', () => {
     try {
       const response = await axios.post(url, { query: createUserMutation });
     } catch (error) {
-      expect(error.response.data.errors[0].code).to.equal(401);
+      expect(error.response.data.errors[0].code).to.equal('BAD_USER_INPUT');
       expect(error.response.data.errors[0].message).to.include('No token provided');
     }
   });
@@ -68,7 +68,7 @@ describe('Create User Mutation', () => {
         headers: { Authorization: 'Bearer invalid_token' },
       });
     } catch (error) {
-      expect(error.response.data.errors[0].code).to.equal(401);
+      expect(error.response.data.errors[0].code).to.equal('BAD_USER_INPUT');
       expect(error.response.data.errors[0].message).to.include('Invalid token');
     }
   });

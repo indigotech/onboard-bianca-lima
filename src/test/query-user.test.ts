@@ -2,13 +2,12 @@ import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import jwt from 'jsonwebtoken';
-import exp from 'constants';
+import { generateToken } from '../utilits/verify-token.js';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = 'secret_key';
+
 const url = `http://localhost:${process.env.PORT}`;
-let validToken = jwt.sign({ userId: 1 }, JWT_SECRET, { expiresIn: '1h' });
+let validToken = generateToken(1, '1h');
 
 describe('User Query', () => {
   beforeEach(async () => {

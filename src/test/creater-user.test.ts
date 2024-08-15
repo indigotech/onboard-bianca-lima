@@ -2,6 +2,7 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
+import { generateToken } from '../utilits/verify-token.js';
 import jwt from 'jsonwebtoken';
 import './index.js';
 
@@ -9,8 +10,8 @@ const prisma = new PrismaClient();
 
 describe('Create User Mutation', () => {
   const url = `http://localhost:${process.env.PORT}`;
-  const validToken = jwt.sign({ userId: 1 }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+  const validToken = generateToken(1, '1h');
+  
   beforeEach(async () => {
     await prisma.user.deleteMany();
   });

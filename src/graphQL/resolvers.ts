@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from '../errors/custom-error.js';
 import { hashPassword, verifyPassword } from '../utilits/hash-password.js';
-import { verifyToken } from '../utilits/verify-token.js';
-import jwt from 'jsonwebtoken';
+import { verifyToken, generateToken } from '../utilits/verify-token.js';
 
 const prisma = new PrismaClient();
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
@@ -54,7 +53,6 @@ const resolvers = {
       if (!data.email) {
         throw CustomError.invalidCredentials();
       }
-
       const user = await prisma.user.findUnique({
         where: { email: data.email },
       });
@@ -68,8 +66,7 @@ const resolvers = {
       }
 
       const expiresIn = args.rememberMe ? '1w' : '1h';
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, expiresIn);
-
+      const token = generateToken(user.id, expiresIn);
       return {
         user,
         token,

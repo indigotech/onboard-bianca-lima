@@ -12,7 +12,7 @@ describe('Login Mutation', () => {
   beforeEach(async () => {
     await prisma.user.deleteMany();
     const hashedPassword = await hashPassword('senha123');
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name: 'User Name',
         email: 'user@example.com',

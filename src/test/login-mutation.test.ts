@@ -2,7 +2,7 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import { hashPassword } from '../src/utilits/hash-password.js';
+import { hashPassword } from '../utilits/hash-password.js';
 import './index.js';
 
 const prisma = new PrismaClient();
@@ -12,7 +12,7 @@ describe('Login Mutation', () => {
   beforeEach(async () => {
     await prisma.user.deleteMany();
     const hashedPassword = await hashPassword('senha123');
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         name: 'User Name',
         email: 'user@example.com',
@@ -52,6 +52,7 @@ describe('Login Mutation', () => {
     expect(response.data.data.login.user.name).to.equal('User Name');
     expect(response.data.data.login.user.birthDate).to.equal('1990-04-25');
     expect(response.data.data.login.user.email).to.equal('user@example.com');
+  
   });
 
   it('should fail to login with incorrect credentials', async () => {
@@ -71,12 +72,12 @@ describe('Login Mutation', () => {
       }
     }
     `;
-    try {
-      await axios.post(url, { query: loginMutation });
-    } catch (error: any) {
-      expect(error.response.data.errors[0].code).to.equal('BAD_USER_INPUT');
-      expect(error.response.data.errors[0].message).to.equal('Invalid email or password');
-    }
-  });
 
+    const response = await axios.post(url, { 
+      query: loginMutation,
+     });
+
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
+    expect(response.data.errors[0].message).to.equal('Invalid email or password');
+  });
 });

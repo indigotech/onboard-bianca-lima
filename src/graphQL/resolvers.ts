@@ -6,8 +6,6 @@ import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
-const JWT_SECRET = 'secret_key';
-
 
 const resolvers = {
   Query: {
@@ -23,7 +21,7 @@ const resolvers = {
 
       const token = context.headers.authorization.split(' ')[1];
       try {
-        await verifyToken(token); 
+        await verifyToken(token);
       } catch {
         throw CustomError.authenticationFalied();
       }
@@ -57,7 +55,7 @@ const resolvers = {
         throw CustomError.invalidCredentials();
       }
 
-      const user = await prisma.user.findUnique({ 
+      const user = await prisma.user.findUnique({
         where: { email: data.email },
       });
 
@@ -70,8 +68,8 @@ const resolvers = {
       }
 
       const expiresIn = args.rememberMe ? '1w' : '1h';
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-    
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, expiresIn);
+
       return {
         user,
         token,

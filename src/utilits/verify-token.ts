@@ -1,10 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'secret_key'; 
-
-export const verifyToken = (token: string): Promise<any> => {
+export const verifyToken = (token: string) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         return reject(err);
       }

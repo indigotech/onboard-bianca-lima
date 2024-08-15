@@ -6,12 +6,11 @@ import jwt from 'jsonwebtoken';
 import './index.js';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = 'secret_key';
 
 describe('Create User Mutation', () => {
   const url = `http://localhost:${process.env.PORT}`;
-  let validToken = jwt.sign({ userId: 1 }, JWT_SECRET, { expiresIn:'1h' });
-  
+  const validToken = jwt.sign({ userId: 1 }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
   beforeEach(async () => {
     await prisma.user.deleteMany();
   });
@@ -36,12 +35,10 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    try {
-      const response = await axios.post(url, { query: createUserMutation });
-    } catch (error) {
-      expect(error.response.data.errors[0].code).to.equal('BAD_USER_INPUT');
-      expect(error.response.data.errors[0].message).to.include('No token provided');
-    }
+    const response = await axios.post(url, { query: createUserMutation });
+
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
+    expect(response.data.errors[0].message).to.include('No token provided');
   });
 
   it('should fail with an invalid token', async () => {
@@ -61,16 +58,18 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    try {
-      const response = await axios.post(url, { 
-        query: createUserMutation
-       }, {
+    const response = await axios.post(
+      url,
+      {
+        query: createUserMutation,
+      },
+      {
         headers: { Authorization: 'Bearer invalid_token' },
-      });
-    } catch (error) {
-      expect(error.response.data.errors[0].code).to.equal('BAD_USER_INPUT');
-      expect(error.response.data.errors[0].message).to.include('Invalid token');
-    }
+      },
+    );
+
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
+    expect(response.data.errors[0].message).to.include('Invalid token');
   });
 
   it('should create a new user', async () => {
@@ -90,12 +89,16 @@ describe('Create User Mutation', () => {
         }
       `;
 
-    const response = await axios.post(url, {
-      query: createUserMutation,
-    }, {
-      headers: { Authorization: `Bearer ${validToken}` },
-    }
+    const response = await axios.post(
+      url,
+      {
+        query: createUserMutation,
+      },
+      {
+        headers: { Authorization: `Bearer ${validToken}` },
+      },
     );
+
     expect(response.data.data.createUser).to.have.property('id');
     expect(response.data.data.createUser.name).to.equal('bia');
     expect(response.data.data.createUser.email).to.equal('bia@example.com');
@@ -111,16 +114,16 @@ describe('Create User Mutation', () => {
     expect(userInDb!.birthDate).to.equal('1990-01-01');
   });
 
-  it('should return an error if the email is already taken', async () => {      
+  it('should return an error if the email is already taken', async () => {
     await prisma.user.create({
       data: {
-        name: "Existing User",
-        email: "existing@example.com",
-        password: "Test1234!",
-        birthDate: "1990-01-01",
+        name: 'Existing User',
+        email: 'existing@example.com',
+        password: 'Test1234!',
+        birthDate: '1990-01-01',
       },
     });
-    
+
     const createUserMutation = `#graphql
       mutation {
         createUser(data: {
@@ -137,13 +140,16 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    
     const response = await axios.post(url, {
       query: createUserMutation,
-    });
-    
+    },
+    {
+      headers: { Authorization: `Bearer ${validToken}` },
+    },
+    );
+
     expect(response.data.errors[0].message).to.equal('Email is already in use');
-    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');  
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
   });
 
   it('should return an error if the password is weak', async () => {
@@ -165,7 +171,11 @@ describe('Create User Mutation', () => {
 
     const response = await axios.post(url, {
       query: createUserMutation,
-    });
+    },
+    {
+      headers: { Authorization: `Bearer ${validToken}` },
+    },
+    );
 
     expect(response.data.errors[0].message).to.equal('Password does not meet security requirements');
     expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');

@@ -1,7 +1,6 @@
-import { GraphQLError } from "graphql";
+import { GraphQLError } from 'graphql';
 
 export class CustomError {
-
   static unsecurityPassword() {
     return new GraphQLError('Password does not meet security requirements', {
       extensions: {
@@ -46,5 +45,4 @@ export class CustomError {
       },
     });
   }
-
 }

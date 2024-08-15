@@ -2,7 +2,7 @@
     "extension": [
       "ts"
     ],
-    "spec": "test/**/*.test.ts",
+    "spec": "src/test/**/*.test.ts",
     "require": [
       "ts-node/register",
       "dotenv/config"

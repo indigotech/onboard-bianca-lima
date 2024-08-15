@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_OPTIONS='--loader ts-node/esm' DOTENV_CONFIG_PATH=test.env mocha",
     "compile": "tsc",
-    "start": "npm run compile && node ./dist/src/index.js",
+    "build": "npm run compile",
+    "start": "node ./dist/index.js",
     "dev": "nodemon"
   },
   "keywords": [],

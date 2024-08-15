@@ -1,7 +1,7 @@
 import { describe, it, before, after } from 'mocha';
 import { expect } from 'chai';
 import axios from 'axios';
-import { startServer, stopServer } from '../src/server.js';
+import { startServer, stopServer } from '../server.js';
 
 let server;
 before(async () => {

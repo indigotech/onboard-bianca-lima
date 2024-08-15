@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from '../errors/custom-error.js';
 import { hashPassword, verifyPassword } from '../utilits/hash-password.js';
+import { verifyToken } from '../utilits/verify-token.js';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
@@ -13,8 +14,19 @@ const resolvers = {
     hello: () => 'Hello, World!',
   },
   Mutation: {
-    createUser: async (parent, args) => {
+    createUser: async (parent, args, context) => {
       const { data } = args;
+
+      if (!context.headers.authorization) {
+        throw new CustomError(401, 'No token provided', 'Authentication required');
+      }
+
+      const token = context.headers.authorization.split(' ')[1];
+      try {
+        await verifyToken(token); 
+      } catch {
+        throw new CustomError(401, 'Invalid token', 'Authentication failed');
+      }
 
       if (!passwordRegex.test(data.password)) {
         throw CustomError.unsecurityPassword();

@@ -2,17 +2,75 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 import './index.js';
 
 const prisma = new PrismaClient();
+const JWT_SECRET = 'secret_key';
 
 describe('Create User Mutation', () => {
   const url = `http://localhost:${process.env.PORT}`;
+  let validToken = jwt.sign({ userId: 1 }, JWT_SECRET, { expiresIn:'1h' });
+  
   beforeEach(async () => {
     await prisma.user.deleteMany();
   });
   afterEach(async () => {
     await prisma.user.deleteMany();
+  });
+
+  it('should fail without a token', async () => {
+    const createUserMutation = `
+      mutation {
+        createUser(data: {
+          name: "Test User",
+          email: "testuser@example.com",
+          password: "password123",
+          birthDate: "1990-01-01"
+        }) {
+          id
+          name
+          email
+          birthDate
+        }
+      }
+    `;
+
+    try {
+      const response = await axios.post(url, { query: createUserMutation });
+    } catch (error) {
+      expect(error.response.data.errors[0].code).to.equal(401);
+      expect(error.response.data.errors[0].message).to.include('No token provided');
+    }
+  });
+
+  it('should fail with an invalid token', async () => {
+    const createUserMutation = `
+      mutation {
+        createUser(data: {
+          name: "Test User",
+          email: "testuser@example.com",
+          password: "password123",
+          birthDate: "1990-01-01"
+        }) {
+          id
+          name
+          email
+          birthDate
+        }
+      }
+    `;
+
+    try {
+      const response = await axios.post(url, { 
+        query: createUserMutation
+       }, {
+        headers: { Authorization: 'Bearer invalid_token' },
+      });
+    } catch (error) {
+      expect(error.response.data.errors[0].code).to.equal(401);
+      expect(error.response.data.errors[0].message).to.include('Invalid token');
+    }
   });
 
   it('should create a new user', async () => {
@@ -34,8 +92,10 @@ describe('Create User Mutation', () => {
 
     const response = await axios.post(url, {
       query: createUserMutation,
-    });
-
+    }, {
+      headers: { Authorization: `Bearer ${validToken}` },
+    }
+    );
     expect(response.data.data.createUser).to.have.property('id');
     expect(response.data.data.createUser.name).to.equal('bia');
     expect(response.data.data.createUser.email).to.equal('bia@example.com');

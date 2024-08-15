@@ -12,6 +12,11 @@ const server = new ApolloServer({
 export const startServer = async (port: number) => {
   const { url } = await startStandaloneServer(server, {
     listen: { port },
+    context: async ({ req }) => {
+      return {
+        headers: req.headers,
+      };
+    },
   });
   console.log(`Servidor rodando na porta ${url}`);
   return { server, url };

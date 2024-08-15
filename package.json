@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "seeds": "node ./test/seeds.js",
     "test": "NODE_OPTIONS='--loader ts-node/esm' DOTENV_CONFIG_PATH=test.env mocha",
     "compile": "tsc",
     "start": "node ./dist/index.js",

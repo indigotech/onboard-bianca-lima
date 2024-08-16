@@ -2,7 +2,6 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import typeDefs from './graphql/type-defs.js';
 import resolvers from './graphql/resolvers.js';
-import { CustomError } from './errors/custom-error.js';
 
 const server = new ApolloServer({
   typeDefs,
@@ -12,6 +11,11 @@ const server = new ApolloServer({
 export const startServer = async (port: number) => {
   const { url } = await startStandaloneServer(server, {
     listen: { port },
+    context: async ({ req }) => {
+      return {
+        headers: req.headers,
+      };
+    },
   });
   console.log(`Servidor rodando na porta ${url}`);
   return { server, url };

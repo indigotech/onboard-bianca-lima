@@ -6,7 +6,7 @@
   "scripts": {
     "test": "NODE_OPTIONS='--loader ts-node/esm' DOTENV_CONFIG_PATH=test.env mocha",
     "compile": "tsc",
-    "start": "npm run compile && node ./dist/index.js",
+    "start": "node ./dist/index.js",
     "dev": "nodemon"
   },
   "keywords": [],
@@ -29,6 +29,7 @@
     "eslint": "9.8.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
+    "jsonwebtoken": "9.0.2",
     "mocha": "10.7.3",
     "nodemon": "3.1.4",
     "prettier": "3.3.3",

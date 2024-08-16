@@ -10,6 +10,12 @@ input UserInput {
   birthDate: String!
 }
 
+input LoginInput {
+  email: String!
+  password: String!
+  rememberMe: Boolean
+}
+
 type User {
   id: ID!
   name: String!
@@ -17,8 +23,14 @@ type User {
   birthDate: String!
 }
 
+type LoginResponse {
+  user: User!
+  token: String!
+}
+
 type Mutation {
   createUser(data: UserInput!): User!
+  login(data: LoginInput!): LoginResponse!
 }
 `;
 

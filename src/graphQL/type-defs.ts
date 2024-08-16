@@ -28,6 +28,7 @@ type LoginResponse {
 type Query {
   hello: String!
   user(id: Int!): User
+  users(max: Int): [User]
 }
 
 type Mutation {

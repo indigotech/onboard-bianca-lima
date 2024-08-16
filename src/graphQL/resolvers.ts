@@ -25,6 +25,27 @@ const resolvers = {
       }
       return user;
     },
+    users: async (parent, args: { max?: number }, context) => {
+      if (!context.headers.authorization) {
+        throw CustomError.authenticationRequired();
+      }
+
+      const token = context.headers.authorization.split(' ')[1];
+      try {
+        await verifyToken(token);
+      } catch {
+        throw CustomError.authenticationFalied();
+      }
+      
+      const maxUsers = args.max ?? 10;
+
+      return prisma.user.findMany({
+        take: maxUsers,
+        orderBy: {
+          name: 'asc',
+        },
+      });
+    },
   },
   Mutation: {
     createUser: async (parent, args, context) => {

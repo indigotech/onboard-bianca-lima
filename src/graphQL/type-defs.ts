@@ -25,10 +25,17 @@ type LoginResponse {
   token: String!
 }
 
+type UsersResponse {
+  users: [User]
+  totalUsers: Int
+  hasMore: Boolean
+  hasPrevious: Boolean
+}
+
 type Query {
   hello: String!
   user(id: Int!): User
-  users(max: Int): [User]
+  users(skip: Int, take: Int): UsersResponse
 }
 
 type Mutation {

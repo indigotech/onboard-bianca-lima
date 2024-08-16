@@ -11,6 +11,7 @@ const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
 const resolvers = {
   Query: {
     hello: () => 'Hello, World!',
+    
     user: async (parent, args, context) => {
       const { id } = args;
 
@@ -25,7 +26,8 @@ const resolvers = {
       }
       return user;
     },
-    users: async (parent, args: { max?: number }, context) => {
+
+    users: async (parent, args: { skip:number, take: number }, context) => {
       if (!context.headers.authorization) {
         throw CustomError.authenticationRequired();
       }
@@ -37,14 +39,23 @@ const resolvers = {
         throw CustomError.authenticationFalied();
       }
       
-      const maxUsers = args.max ?? 10;
-
-      return prisma.user.findMany({
-        take: maxUsers,
+      const { skip=0, take=10 } = args;
+      const users = prisma.user.findMany({
+        skip,
+        take,
         orderBy: {
           name: 'asc',
         },
       });
+      
+      const totalUsers = await prisma.user.count(); 
+
+      return{
+        users,
+        totalUsers,
+        hasMore: (skip + take) < totalUsers,
+        hasPrevious: skip > 0,
+      } 
     },
   },
   Mutation: {

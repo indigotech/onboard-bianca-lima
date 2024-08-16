@@ -3,7 +3,8 @@ import { hashPassword } from '../utilits/hash-password.js';
 
 const prisma = new PrismaClient();
 
-async function seed() {
+export async function seed(length? : number) {
+  const newLength = length || 50;
   const hashedPassword = await hashPassword('password123');
   const users: { name: string; email: string; password: string; birthDate: string }[] = [];
 

@@ -11,13 +11,13 @@ const resolvers = {
     hello: () => 'Hello, World!',
     user: async (parent, args, context) => {
       const { id } = args;
-      
+
       if (!context.headers.authorization) {
         throw CustomError.authenticationRequired();
       }
       const token = context.headers.authorization.split(' ')[1];
       try {
-        await verifyToken(token); 
+        await verifyToken(token);
       } catch {
         throw CustomError.authenticationFalied();
       }

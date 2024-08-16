@@ -7,7 +7,7 @@ import { generateToken } from '../utilits/verify-token.js';
 const prisma = new PrismaClient();
 
 const url = `http://localhost:${process.env.PORT}`;
-let validToken = generateToken(1, '1h');
+const validToken = generateToken(1, '1h');
 
 describe('User Query', () => {
   beforeEach(async () => {
@@ -16,15 +16,14 @@ describe('User Query', () => {
 
   it('should return user data for a valid ID', async () => {
     const user = await prisma.user.create({
-        data: {
-          name: "Existing User",
-          email: "existing@example.com",
-          password: "Test1234!",
-          birthDate: "1990-01-01",
-        },
+      data: {
+        name: 'Existing User',
+        email: 'existing@example.com',
+        password: 'Test1234!',
+        birthDate: '1990-01-01',
+      },
     });
 
-    
     const query = `
       query {
         user(id: ${user.id}) {
@@ -36,20 +35,23 @@ describe('User Query', () => {
       }
     `;
 
-    const response = await axios.post(url, { query }, {
-      headers: { Authorization: `Bearer ${validToken}` },
-    });
+    const response = await axios.post(
+      url,
+      { query },
+      {
+        headers: { Authorization: `Bearer ${validToken}` },
+      },
+    );
 
     expect(response.data.data.user).to.have.property('id');
     expect(Number(response.data.data.user.id)).to.equal(user.id);
-    expect(response.data.data.user.name).to.equal("Existing User");
-    expect(response.data.data.user.email).to.equal("existing@example.com");
-    expect(response.data.data.user.birthDate).to.equal("1990-01-01");
-    
+    expect(response.data.data.user.name).to.equal('Existing User');
+    expect(response.data.data.user.email).to.equal('existing@example.com');
+    expect(response.data.data.user.birthDate).to.equal('1990-01-01');
   });
 
   it('should return an error for an invalid ID', async () => {
-    const invalidUserId = 999; 
+    const invalidUserId = 999;
     const query = `
       query {
         user(id: ${invalidUserId}) {
@@ -61,13 +63,15 @@ describe('User Query', () => {
       }
     `;
 
-    try {
-      const response = await axios.post(url, { query }, {
+    const response = await axios.post(
+      url,
+      { query },
+      {
         headers: { Authorization: `Bearer ${validToken}` },
-      });
-    } catch (error) {
-      expect(error.response.data.errors[0].code).to.equal(404);
-      expect(error.response.data.errors[0].message).to.include('User not found');
-    }
+      },
+    );
+
+    expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
+    expect(response.data.errors[0].message).to.include('User not found');
   });
 });

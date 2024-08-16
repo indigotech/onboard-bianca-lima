@@ -1,13 +1,15 @@
 import { PrismaClient } from '@prisma/client';
+import { hashPassword } from '../utilits/hash-password.js';
 
 const prisma = new PrismaClient();
 
 async function seed() {
+  const hashedPassword = await hashPassword('password123');
   const users = await Array.from({ length: 50 }).map((_, i) => ({
     name: `User ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    password: 'password123', //adicionar hash
-    birthDate: (new Date()).toDateString(),
+    email: `user${Date.now() + i}@example.com`,
+    password: hashedPassword,
+    birthDate: new Date().toDateString(),
   }));
 
   await prisma.user.createMany({

@@ -52,7 +52,6 @@ describe('Login Mutation', () => {
     expect(response.data.data.login.user.name).to.equal('User Name');
     expect(response.data.data.login.user.birthDate).to.equal('1990-04-25');
     expect(response.data.data.login.user.email).to.equal('user@example.com');
-  
   });
 
   it('should fail to login with incorrect credentials', async () => {
@@ -73,9 +72,9 @@ describe('Login Mutation', () => {
     }
     `;
 
-    const response = await axios.post(url, { 
+    const response = await axios.post(url, {
       query: loginMutation,
-     });
+    });
 
     expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
     expect(response.data.errors[0].message).to.equal('Invalid email or password');

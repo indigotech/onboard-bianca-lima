@@ -9,6 +9,20 @@ const prisma = new PrismaClient();
 
 describe('Login Mutation', () => {
   const url = `http://localhost:${process.env.PORT}`;
+  const loginMutation = `#graphql
+      mutation Login($email: String!, $password: String!) {
+        login(data: { email: $email, password: $password }) {
+          user {
+            id
+            name
+            email
+            birthDate
+          }
+          token
+        }
+      }
+    `;
+
   beforeEach(async () => {
     await prisma.user.deleteMany();
     const hashedPassword = await hashPassword('senha123');
@@ -27,24 +41,13 @@ describe('Login Mutation', () => {
   });
 
   it('should login successfully with correct credentials', async () => {
-    const loginMutation = `#graphql
-    mutation {
-      login(data: {
-        email: "user@example.com", 
-        password: "senha123",
-        }) {
-        user {
-          id
-          name
-          email
-          birthDate
-        }
-        token
-      }
-    }
-    `;
+    const variables = {
+      email: "user@example.com",
+      password: "senha123",
+    };
     const response = await axios.post(url, {
       query: loginMutation,
+      variables: variables,
     });
 
     expect(response.data.data.login).to.have.property('user');
@@ -52,30 +55,18 @@ describe('Login Mutation', () => {
     expect(response.data.data.login.user.name).to.equal('User Name');
     expect(response.data.data.login.user.birthDate).to.equal('1990-04-25');
     expect(response.data.data.login.user.email).to.equal('user@example.com');
-  
   });
 
   it('should fail to login with incorrect credentials', async () => {
-    const loginMutation = `#graphql
-    mutation {
-      login(data: {
-        email: "wronguser@example.com", 
-        password: "wrongpassword123",
-        }) {
-        user {
-          id
-          name
-          email
-          birthDate
-        }
-        token
-      }
-    }
-    `;
+    const variables = {
+      email: "wronguser@example.com",
+      password: "wrongpassword123",
+    };
 
-    const response = await axios.post(url, { 
+    const response = await axios.post(url, {
       query: loginMutation,
-     });
+      variables: variables,
+    });
 
     expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
     expect(response.data.errors[0].message).to.equal('Invalid email or password');

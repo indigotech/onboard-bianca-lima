@@ -1,7 +1,4 @@
 const typeDefs = `#graphql
-type Query {
-    hello: String!
-}
 
 input UserInput {
   name: String!
@@ -26,6 +23,11 @@ type User {
 type LoginResponse {
   user: User!
   token: String!
+}
+
+type Query {
+  hello: String!
+  user(id: Int!): User
 }
 
 type Mutation {

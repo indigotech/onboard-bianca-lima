@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 import { generateToken } from '../utilits/verify-token.js';
-import jwt from 'jsonwebtoken';
 import './index.js';
 
 const prisma = new PrismaClient();
@@ -11,7 +10,7 @@ const prisma = new PrismaClient();
 describe('Create User Mutation', () => {
   const url = `http://localhost:${process.env.PORT}`;
   const validToken = generateToken(1, '1h');
-  
+
   beforeEach(async () => {
     await prisma.user.deleteMany();
   });
@@ -108,7 +107,8 @@ describe('Create User Mutation', () => {
     const userInDb = await prisma.user.findUnique({
       where: { email: 'bia@example.com' },
     });
-    expect(userInDb).to.not.be.null;
+
+    expect(userInDb).to.not.equal(null);
     expect(userInDb!.id).to.equal(Number(response.data.data.createUser.id));
     expect(userInDb!.name).to.equal('bia');
     expect(userInDb!.email).to.equal('bia@example.com');
@@ -141,12 +141,14 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    const response = await axios.post(url, {
-      query: createUserMutation,
-    },
-    {
-      headers: { Authorization: `Bearer ${validToken}` },
-    },
+    const response = await axios.post(
+      url,
+      {
+        query: createUserMutation,
+      },
+      {
+        headers: { Authorization: `Bearer ${validToken}` },
+      },
     );
 
     expect(response.data.errors[0].message).to.equal('Email is already in use');
@@ -170,12 +172,14 @@ describe('Create User Mutation', () => {
       }
     `;
 
-    const response = await axios.post(url, {
-      query: createUserMutation,
-    },
-    {
-      headers: { Authorization: `Bearer ${validToken}` },
-    },
+    const response = await axios.post(
+      url,
+      {
+        query: createUserMutation,
+      },
+      {
+        headers: { Authorization: `Bearer ${validToken}` },
+      },
     );
 
     expect(response.data.errors[0].message).to.equal('Password does not meet security requirements');

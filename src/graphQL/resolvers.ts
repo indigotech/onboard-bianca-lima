@@ -1,29 +1,36 @@
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from '../errors/custom-error.js';
 import { hashPassword, verifyPassword } from '../utilits/hash-password.js';
-import { verifyToken, generateToken } from '../utilits/verify-token.js';
+import { authenticateToken, generateToken } from '../utilits/verify-token.js';
 
 const prisma = new PrismaClient();
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
 
+
+
 const resolvers = {
   Query: {
     hello: () => 'Hello, World!',
+    user: async (parent, args, context) => {
+      const { id } = args;
+
+      await authenticateToken(context);
+
+      const user = await prisma.user.findUnique({
+        where: { id: Number(id) },
+      });
+
+      if (!user) {
+        throw CustomError.userNotFound();
+      }
+      return user;
+    },
   },
   Mutation: {
     createUser: async (parent, args, context) => {
       const { data } = args;
 
-      if (!context.headers.authorization) {
-        throw CustomError.authenticationRequired();
-      }
-
-      const token = context.headers.authorization.split(' ')[1];
-      try {
-        await verifyToken(token);
-      } catch {
-        throw CustomError.authenticationFalied();
-      }
+      await authenticateToken(context);
 
       if (!passwordRegex.test(data.password)) {
         throw CustomError.unsecurityPassword();

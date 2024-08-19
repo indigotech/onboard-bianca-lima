@@ -6,8 +6,6 @@ import { authenticateToken, generateToken } from '../utilits/verify-token.js';
 const prisma = new PrismaClient();
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
 
-
-
 const resolvers = {
   Query: {
     hello: () => 'Hello, World!',
@@ -28,16 +26,8 @@ const resolvers = {
     },
 
     users: async (parent, args: { skip: number; take: number }, context) => {
-      if (!context.headers.authorization) {
-        throw CustomError.authenticationRequired();
-      }
-
-      const token = context.headers.authorization.split(' ')[1];
-      try {
-        await verifyToken(token);
-      } catch {
-        throw CustomError.authenticationFalied();
-      }
+      
+      await authenticateToken(context);
 
       const { skip = 0, take = 10 } = args;
       const users = prisma.user.findMany({

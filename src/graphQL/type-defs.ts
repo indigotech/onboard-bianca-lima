@@ -13,11 +13,34 @@ input LoginInput {
   rememberMe: Boolean
 }
 
+input AddressInput {
+  cep: String!
+  street: String!
+  number: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+}
+
+type Address {
+  id: ID!
+  cep: String!
+  street: String!
+  number: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+  user: User!
+}
+
 type User {
   id: ID!
   name: String!
   email: String!
   birthDate: String!
+  addresses: [Address!]!
 }
 
 type LoginResponse {

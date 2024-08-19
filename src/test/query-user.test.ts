@@ -4,12 +4,23 @@ import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 import { generateToken } from '../utilits/verify-token.js';
 
-const prisma = new PrismaClient();
-
-const url = `http://localhost:${process.env.PORT}`;
-const validToken = generateToken(1, '1h');
 
 describe('User Query', () => {
+
+  const prisma = new PrismaClient();
+  const url = `http://localhost:${process.env.PORT}`;
+  const validToken = generateToken(1, '1h');  
+  const query = `
+    query ($userId: Int!) {
+      user(id: $userId) {
+        id
+        name
+        email
+        birthDate
+      }
+    }
+  `;
+
   beforeEach(async () => {
     await prisma.user.deleteMany();
   });
@@ -24,48 +35,38 @@ describe('User Query', () => {
       },
     });
 
-    const query = `
-      query {
-        user(id: ${user.id}) {
-          id
-          name
-          email
-          birthDate
-        }
-      }
-    `;
+    const variables = {
+      userId: user.id,
+    };
 
     const response = await axios.post(
       url,
-      { query },
+      { query, variables },
       {
         headers: { Authorization: `Bearer ${validToken}` },
       },
     );
 
+    const expectedUser = {
+      id: user.id.toString(),
+      name: 'Existing User',
+      email: 'existing@example.com',
+      birthDate: '1990-01-01',
+    };
     expect(response.data.data.user).to.have.property('id');
-    expect(Number(response.data.data.user.id)).to.equal(user.id);
-    expect(response.data.data.user.name).to.equal('Existing User');
-    expect(response.data.data.user.email).to.equal('existing@example.com');
-    expect(response.data.data.user.birthDate).to.equal('1990-01-01');
+    expect(response.data.data.user).to.deep.equal(expectedUser);
   });
 
   it('should return an error for an invalid ID', async () => {
     const invalidUserId = 999;
-    const query = `
-      query {
-        user(id: ${invalidUserId}) {
-          id
-          name
-          email
-          birthDate
-        }
-      }
-    `;
+
+    const variables = {
+      userId: invalidUserId,
+    };
 
     const response = await axios.post(
       url,
-      { query },
+      { query, variables },
       {
         headers: { Authorization: `Bearer ${validToken}` },
       },

@@ -5,20 +5,25 @@ const prisma = new PrismaClient();
 
 async function seed() {
   const hashedPassword = await hashPassword('password123');
-  const users = await Array.from({ length: 50 }).map((_, i) => ({
-    name: `User ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    password: hashedPassword,
-    birthDate: new Date().toDateString(),
-  }));
+  const users: { name: string; email: string; password: string; birthDate: string }[] = [];
+
+  for (let i = 0; i < 50; i++) {
+    users.push({
+      name: `User ${i + 1}`,
+      email: `user${i + 1}@example.com`,
+      password: hashedPassword,
+      birthDate: new Date().toDateString(),
+    });
+  }
 
   await prisma.user.createMany({
     data: users,
   });
 }
 
-seed()
-  .catch((e) => console.error(e))
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+try {
+  await seed();
+  await prisma.$disconnect();
+} catch (e) {
+  console.error(e);
+}

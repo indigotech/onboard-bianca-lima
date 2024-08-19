@@ -5,6 +5,7 @@ input UserInput {
   email: String!
   password: String!
   birthDate: String!
+  addresses: [AddressInput!]
 }
 
 input LoginInput {

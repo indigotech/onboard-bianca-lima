@@ -17,7 +17,7 @@ input LoginInput {
 input AddressInput {
   cep: String!
   street: String!
-  number: String!
+  streetNumber: String!
   complement: String
   neighborhood: String!
   city: String!
@@ -28,7 +28,7 @@ type Address {
   id: ID!
   cep: String!
   street: String!
-  number: String!
+  streetNumber: String!
   complement: String
   neighborhood: String!
   city: String!

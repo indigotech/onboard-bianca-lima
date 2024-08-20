@@ -15,7 +15,7 @@ const resolvers = {
 
       const user = await prisma.user.findUnique({
         where: { id: Number(id) },
-        include: { addresses: true },
+        //include: { addresses: true },
       });
     
       if (!user) {
@@ -35,7 +35,7 @@ const resolvers = {
         orderBy: {
           name: 'asc',
         },
-        include: { addresses: true },
+        //include: { addresses: true },
       });
     
       const totalUsers = await prisma.user.count();
@@ -72,7 +72,7 @@ const resolvers = {
           email: data.email,
           password: hashedPassword,
           birthDate: data.birthDate,
-          addresses: { create: data.addresses },
+          //addresses: { create: data.addresses },
         },
       });
       return newUser;

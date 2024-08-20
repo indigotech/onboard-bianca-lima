@@ -42,8 +42,8 @@ describe('Login Mutation', () => {
 
   it('should login successfully with correct credentials', async () => {
     const variables = {
-      email: "user@example.com",
-      password: "senha123",
+      email: 'user@example.com',
+      password: 'senha123',
     };
     const response = await axios.post(url, {
       query: loginMutation,
@@ -59,8 +59,8 @@ describe('Login Mutation', () => {
 
   it('should fail to login with incorrect credentials', async () => {
     const variables = {
-      email: "wronguser@example.com",
-      password: "wrongpassword123",
+      email: 'wronguser@example.com',
+      password: 'wrongpassword123',
     };
 
     const response = await axios.post(url, {

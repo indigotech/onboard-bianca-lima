@@ -26,16 +26,15 @@ type LoginResponse {
 }
 
 type UsersResponse {
-  users: [User]
-  totalUsers: Int
-  hasMore: Boolean
-  hasPrevious: Boolean
+  users: [User!]
+  totalUsers: Int!
+  hasMore: Boolean!
+  hasPrevious: Boolean!
 }
 
 type Query {
-  hello: String!
-  user(id: Int!): User
-  users(skip: Int, take: Int): UsersResponse
+  user(id: Int!): User!
+  users(skip: Int, take: Int): UsersResponse!
 }
 
 type Mutation {

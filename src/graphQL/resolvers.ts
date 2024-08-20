@@ -8,8 +8,6 @@ const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
 
 const resolvers = {
   Query: {
-    hello: () => 'Hello, World!',
-
     user: async (parent, args, context) => {
       const { id } = args;
 
@@ -26,7 +24,6 @@ const resolvers = {
     },
 
     users: async (parent, args: { skip: number; take: number }, context) => {
-      
       await authenticateToken(context);
 
       const { skip = 0, take = 10 } = args;

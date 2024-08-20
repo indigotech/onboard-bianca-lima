@@ -3,24 +3,22 @@ import { hashPassword } from '../utilits/hash-password.js';
 
 const prisma = new PrismaClient();
 
-export async function seed(length?: number) {
-  const newLength = length || 50;
+export async function seed(length: number = 50) {
   const hashedPassword = await hashPassword('password123');
-  const users: { name: string; email: string; password: string; birthDate: string }[] = [];
+  const users = [];
 
-  for (let i = 0; i < 50; i++) {
-    users.push({
-      name: `User ${i + 1}`,
-      email: `user${i + 1}@example.com`,
-      password: hashedPassword,
-      birthDate: new Date().toDateString(),
+  for (let i = 0; i < length; i++) {
+    const user = await prisma.user.create({
+      data: {
+        name: `User ${i + 1}`,
+        email: `user${i + 1}@example.com`,
+        password: hashedPassword,
+        birthDate: new Date().toISOString().split('T')[0],
+      },
     });
+    users.push(user);
   }
 
-  await prisma.user.createMany({
-    data: users,
-  });
-  
   return users;
 }
 

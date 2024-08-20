@@ -4,12 +4,10 @@ import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 import { generateToken } from '../utilits/verify-token.js';
 
-
 describe('User Query', () => {
-
   const prisma = new PrismaClient();
   const url = `http://localhost:${process.env.PORT}`;
-  const validToken = generateToken(1, '1h');  
+  const validToken = generateToken(1, '1h');
   const query = `
     query ($userId: Int!) {
       user(id: $userId) {

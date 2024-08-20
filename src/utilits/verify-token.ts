@@ -18,7 +18,7 @@ export const generateToken = (id: number, expiresIn: string) => {
   return jwt.sign({ userId: id }, JWT_SECRET, { expiresIn });
 };
 
-export async function authenticateToken (context){
+export async function authenticateToken(context) {
   if (!context.headers.authorization || !context.headers.authorization.startsWith('Bearer')) {
     throw CustomError.authenticationRequired();
   }

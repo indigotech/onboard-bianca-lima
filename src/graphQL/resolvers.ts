@@ -15,7 +15,9 @@ const resolvers = {
 
       const user = await prisma.user.findUnique({
         where: { id: Number(id) },
-        include: { addresses: true },
+        include: { 
+          addresses: true,
+        },
       });
     
       if (!user) {
@@ -74,6 +76,7 @@ const resolvers = {
           birthDate: data.birthDate,
           addresses: { create: data.addresses },
         },
+        include: {addresses: true,}
       });
       return newUser;
     },
@@ -102,6 +105,19 @@ const resolvers = {
         token,
       };
     },
+
+    addAddress: async (_, { userId, address }) => {
+      return await prisma.user.update({
+        where: { id: Number(userId) },
+        data: {
+          addresses: {
+            create: address,
+          },
+        },
+        include: { addresses: true },
+      });
+    },
+
   },
 };
 

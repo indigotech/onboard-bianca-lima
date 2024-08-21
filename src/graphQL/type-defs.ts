@@ -41,7 +41,7 @@ type User {
   name: String!
   email: String!
   birthDate: String!
-  addresses: [Address!]!
+  addresses: [Address!]
 }
 
 type LoginResponse {
@@ -64,6 +64,7 @@ type Query {
 type Mutation {
   createUser(data: UserInput!): User!
   login(data: LoginInput!): LoginResponse!
+  addAddress(userId: ID!, address: AddressInput!): User!
 }
 `;
 

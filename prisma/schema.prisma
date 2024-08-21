@@ -13,7 +13,7 @@ model User {
   email     String  @unique
   password  String
   birthDate String
-  addresses Address[]
+  addresses Address[] @relation("UserAddresses")
 }
 
 model Address {
@@ -26,5 +26,5 @@ model Address {
   city          String
   state         String
   userId        Int
-  user          User   @relation(fields: [userId], references: [id])
+  user          User   @relation("UserAddresses", fields: [userId], references: [id], onDelete: Cascade)
 }

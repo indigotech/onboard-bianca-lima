@@ -64,7 +64,6 @@ type Query {
 type Mutation {
   createUser(data: UserInput!): User!
   login(data: LoginInput!): LoginResponse!
-  addAddress(userId: ID!, address: AddressInput!): User!
 }
 `;
 

@@ -20,6 +20,16 @@ describe('Users Query', () => {
           name
           email
           birthDate
+          addresses {
+            cep
+            city
+            complement
+            id
+            neighborhood
+            state
+            street
+            streetNumber
+          }
         }
         totalUsers
         hasMore
@@ -30,9 +40,7 @@ describe('Users Query', () => {
   beforeEach(async () => {
     await prisma.user.deleteMany();
     users = await seed(totalUsers);
-    users.sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
+    users.sort((a, b) => a.name.localeCompare(b.name));
   });
 
   afterEach(async () => {
@@ -53,22 +61,36 @@ describe('Users Query', () => {
       },
     );
 
-    expect(response.data.data.users.users).to.have.lengthOf(variables.take);
+    const returnedUsers = response.data.data.users.users;
+    expect(returnedUsers).to.have.lengthOf(variables.take);
     expect(response.data.data.users.totalUsers).to.be.greaterThanOrEqual(totalUsers);
     expect(response.data.data.users.hasMore).to.equal(true);
     expect(response.data.data.users.hasPrevious).to.equal(false);
-    expect(response.data.data.users.users).to.be.deep.equal(
-      users
-        .slice(variables.skip, variables.take + variables.skip)
-        .map((user) => ({ id: String(user.id), name: user.name, email: user.email, birthDate: user.birthDate })),
-    );
+
+    returnedUsers.forEach((user, index) => {
+      const expectedUser = users[variables.skip + index];
+      expect(user.id).to.equal(String(expectedUser.id));
+      expect(user.name).to.equal(expectedUser.name);
+      expect(user.email).to.equal(expectedUser.email);
+      expect(user.birthDate).to.equal(expectedUser.birthDate);
+      user.addresses.forEach((addresses, index2) => {
+        expect(addresses.cep).to.equal(expectedUser.addresses[index2].cep);
+        expect(addresses.city).to.equal(expectedUser.addresses[index2].city);
+        expect(addresses.complement).to.equal(expectedUser.addresses[index2].complement);
+        expect(addresses.neighborhood).to.equal(expectedUser.addresses[index2].neighborhood);
+        expect(addresses.state).to.equal(expectedUser.addresses[index2].state);
+        expect(addresses.street).to.equal(expectedUser.addresses[index2].street);
+        expect(addresses.streetNumber).to.equal(expectedUser.addresses[index2].streetNumber);
+      });
+    });
   });
 
-  it('should return the first page of users with correct pagination metadata', async () => {
+  it('should return the second page of users with correct pagination metadata', async () => {
     const variables = {
       skip: 5,
       take: 5,
     };
+
     const response = await axios.post(
       url,
       { query, variables },
@@ -77,15 +99,28 @@ describe('Users Query', () => {
       },
     );
 
-    expect(response.data.data.users.users).to.have.lengthOf(variables.take);
+    const returnedUsers = response.data.data.users.users;
+    expect(returnedUsers).to.have.lengthOf(variables.take);
     expect(response.data.data.users.totalUsers).to.be.greaterThanOrEqual(totalUsers);
     expect(response.data.data.users.hasMore).to.equal(true);
     expect(response.data.data.users.hasPrevious).to.equal(true);
-    expect(response.data.data.users.users).to.be.deep.eq(
-      users
-        .slice(variables.skip, variables.take + variables.skip)
-        .map((user) => ({ id: String(user.id), name: user.name, email: user.email, birthDate: user.birthDate })),
-    );
+
+    returnedUsers.forEach((user, index) => {
+      const expectedUser = users[variables.skip + index];
+      expect(user.id).to.equal(String(expectedUser.id));
+      expect(user.name).to.equal(expectedUser.name);
+      expect(user.email).to.equal(expectedUser.email);
+      expect(user.birthDate).to.equal(expectedUser.birthDate);
+      user.addresses.forEach((addresses, index2) => {
+        expect(addresses.cep).to.equal(expectedUser.addresses[index2].cep);
+        expect(addresses.city).to.equal(expectedUser.addresses[index2].city);
+        expect(addresses.complement).to.equal(expectedUser.addresses[index2].complement);
+        expect(addresses.neighborhood).to.equal(expectedUser.addresses[index2].neighborhood);
+        expect(addresses.state).to.equal(expectedUser.addresses[index2].state);
+        expect(addresses.street).to.equal(expectedUser.addresses[index2].street);
+        expect(addresses.streetNumber).to.equal(expectedUser.addresses[index2].streetNumber);
+      });
+    });
   });
 
   it('should correctly paginate to the last page of users', async () => {
@@ -93,6 +128,7 @@ describe('Users Query', () => {
       skip: 10,
       take: 5,
     };
+
     const response = await axios.post(
       url,
       { query, variables },
@@ -101,15 +137,28 @@ describe('Users Query', () => {
       },
     );
 
-    expect(response.data.data.users.users).to.have.lengthOf(variables.take);
+    const returnedUsers = response.data.data.users.users;
+    expect(returnedUsers).to.have.lengthOf(variables.take);
     expect(response.data.data.users.totalUsers).to.be.greaterThanOrEqual(totalUsers);
     expect(response.data.data.users.hasMore).to.equal(false);
     expect(response.data.data.users.hasPrevious).to.equal(true);
-    expect(response.data.data.users.users).to.be.deep.eq(
-      users
-        .slice(variables.skip, variables.take + variables.skip)
-        .map((user) => ({ id: String(user.id), name: user.name, email: user.email, birthDate: user.birthDate })),
-    );
+
+    returnedUsers.forEach((user, index) => {
+      const expectedUser = users[variables.skip + index];
+      expect(user.id).to.equal(String(expectedUser.id));
+      expect(user.name).to.equal(expectedUser.name);
+      expect(user.email).to.equal(expectedUser.email);
+      expect(user.birthDate).to.equal(expectedUser.birthDate);
+      user.addresses.forEach((addresses, index2) => {
+        expect(addresses.cep).to.equal(expectedUser.addresses[index2].cep);
+        expect(addresses.city).to.equal(expectedUser.addresses[index2].city);
+        expect(addresses.complement).to.equal(expectedUser.addresses[index2].complement);
+        expect(addresses.neighborhood).to.equal(expectedUser.addresses[index2].neighborhood);
+        expect(addresses.state).to.equal(expectedUser.addresses[index2].state);
+        expect(addresses.street).to.equal(expectedUser.addresses[index2].street);
+        expect(addresses.streetNumber).to.equal(expectedUser.addresses[index2].streetNumber);
+      });
+    });
   });
 
   it('should return an empty list when skip exceeds the total number of users', async () => {
@@ -117,6 +166,7 @@ describe('Users Query', () => {
       skip: 15,
       take: 5,
     };
+
     const response = await axios.post(
       url,
       { query, variables },
@@ -125,15 +175,10 @@ describe('Users Query', () => {
       },
     );
 
-    expect(response.data.data.users.users).to.have.lengthOf(0);
+    const returnedUsers = response.data.data.users.users;
+    expect(returnedUsers).to.have.lengthOf(0);
     expect(response.data.data.users.totalUsers).to.be.greaterThanOrEqual(totalUsers);
     expect(response.data.data.users.hasMore).to.equal(false);
     expect(response.data.data.users.hasPrevious).to.equal(true);
-    expect(response.data.data.users.users).to.be.deep.eq(
-      users
-        .slice(variables.skip, variables.take + variables.skip)
-        .map((user) => ({ id: String(user.id), name: user.name, email: user.email, birthDate: user.birthDate })),
-    );
   });
-
 });

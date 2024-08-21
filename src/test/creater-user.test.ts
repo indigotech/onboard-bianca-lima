@@ -11,6 +11,26 @@ describe('Create User Mutation', () => {
   const url = `http://localhost:${process.env.PORT}`;
   const validToken = generateToken(1, '1h');
 
+  const createUserMutation = `
+  mutation ($data: UserInput!) {
+    createUser(data: $data) {
+      id
+      name
+      email
+      birthDate
+      addresses {
+        cep
+        city
+        complement
+        id
+        neighborhood
+        state
+        street
+        streetNumber
+      }
+    }
+  }
+`;
   beforeEach(async () => {
     await prisma.user.deleteMany();
   });
@@ -19,49 +39,58 @@ describe('Create User Mutation', () => {
   });
 
   it('should fail without a token', async () => {
-    const createUserMutation = `
-      mutation {
-        createUser(data: {
-          name: "Test User",
-          email: "testuser@example.com",
-          password: "password123",
-          birthDate: "1990-01-01"
-        }) {
-          id
-          name
-          email
-          birthDate
-        }
-      }
-    `;
+    const variables = {
+      data: {
+        name: 'Test User',
+        email: 'testuser@example.com',
+        password: 'password123',
+        birthDate: '1990-01-01',
+        addresses: [
+          {
+            cep: 'cep-test',
+            city: 'city-test',
+            complement: 'complement-test',
+            neighborhood: 'neighborhood-test',
+            state: 'state-test',
+            street: 'street-test',
+            streetNumber: 'street-number-test',
+          },
+        ],
+      },
+    };
 
-    const response = await axios.post(url, { query: createUserMutation });
+    const response = await axios.post(url, { query: createUserMutation, variables });
 
     expect(response.data.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
     expect(response.data.errors[0].message).to.include('No token provided');
   });
 
   it('should fail with an invalid token', async () => {
-    const createUserMutation = `
-      mutation {
-        createUser(data: {
-          name: "Test User",
-          email: "testuser@example.com",
-          password: "password123",
-          birthDate: "1990-01-01"
-        }) {
-          id
-          name
-          email
-          birthDate
-        }
-      }
-    `;
+    const variables = {
+      data: {
+        name: 'Test User',
+        email: 'testuser@example.com',
+        password: 'password123',
+        birthDate: '1990-01-01',
+        addresses: [
+          {
+            cep: 'cep-test',
+            city: 'city-test',
+            complement: 'complement-test',
+            neighborhood: 'neighborhood-test',
+            state: 'state-test',
+            street: 'street-test',
+            streetNumber: 'street-number-test',
+          },
+        ],
+      },
+    };
 
     const response = await axios.post(
       url,
       {
         query: createUserMutation,
+        variables,
       },
       {
         headers: { Authorization: 'Bearer invalid_token' },
@@ -73,46 +102,59 @@ describe('Create User Mutation', () => {
   });
 
   it('should create a new user', async () => {
-    const createUserMutation = `#graphql
-        mutation {
-          createUser(data: {
-            name: "bia",
-            email: "bia@example.com",
-            password: "senha123",
-            birthDate: "1990-01-01"
-          }) {
-            id
-            name
-            email
-            birthDate
-          }
-        }
-      `;
+    const variables = {
+      data: {
+        name: 'Test User',
+        email: 'testuser@example.com',
+        password: 'password123',
+        birthDate: '1990-01-01',
+        addresses: [
+          {
+            cep: 'cep-test',
+            city: 'city-test',
+            complement: 'complement-test',
+            neighborhood: 'neighborhood-test',
+            state: 'state-test',
+            street: 'street-test',
+            streetNumber: 'street-number-test',
+          },
+        ],
+      },
+      include: { adresses: true },
+    };
 
     const response = await axios.post(
       url,
       {
         query: createUserMutation,
+        variables,
       },
       {
         headers: { Authorization: `Bearer ${validToken}` },
       },
     );
-
     expect(response.data.data.createUser).to.have.property('id');
-    expect(response.data.data.createUser.name).to.equal('bia');
-    expect(response.data.data.createUser.email).to.equal('bia@example.com');
-    expect(response.data.data.createUser.birthDate).to.equal('1990-01-01');
-
+    expect(response.data.data.createUser.name).to.equal(variables.data.name);
+    expect(response.data.data.createUser.email).to.equal(variables.data.email);
+    expect(response.data.data.createUser.birthDate).to.equal(variables.data.birthDate);
+    response.data.data.createUser.addresses.forEach((addresses, index) => {
+      expect(addresses.cep).to.equal(variables.data.addresses[index].cep);
+      expect(addresses.city).to.equal(variables.data.addresses[index].city);
+      expect(addresses.complement).to.equal(variables.data.addresses[index].complement);
+      expect(addresses.neighborhood).to.equal(variables.data.addresses[index].neighborhood);
+      expect(addresses.state).to.equal(variables.data.addresses[index].state);
+      expect(addresses.street).to.equal(variables.data.addresses[index].street);
+      expect(addresses.streetNumber).to.equal(variables.data.addresses[index].streetNumber);
+    });
     const userInDb = await prisma.user.findUnique({
-      where: { email: 'bia@example.com' },
+      where: { email: variables.data.email },
     });
 
     expect(userInDb).to.not.equal(null);
     expect(userInDb!.id).to.equal(Number(response.data.data.createUser.id));
-    expect(userInDb!.name).to.equal('bia');
-    expect(userInDb!.email).to.equal('bia@example.com');
-    expect(userInDb!.birthDate).to.equal('1990-01-01');
+    expect(userInDb!.name).to.equal(variables.data.name);
+    expect(userInDb!.email).to.equal(variables.data.email);
+    expect(userInDb!.birthDate).to.equal(variables.data.birthDate);
   });
 
   it('should return an error if the email is already taken', async () => {
@@ -125,26 +167,31 @@ describe('Create User Mutation', () => {
       },
     });
 
-    const createUserMutation = `#graphql
-      mutation {
-        createUser(data: {
-          name: "Existing User",
-          email: "existing@example.com",
-          password: "senha123",
-          birthDate: "1990-01-01"
-        }) {
-          id
-          name
-          email
-          birthDate
-        }
-      }
-    `;
+    const variables = {
+      data: {
+        name: 'Existing User',
+        email: 'existing@example.com',
+        password: 'password123',
+        birthDate: '1990-01-01',
+        addresses: [
+          {
+            cep: 'cep-test',
+            city: 'city-test',
+            complement: 'complement-test',
+            neighborhood: 'neighborhood-test',
+            state: 'state-test',
+            street: 'street-test',
+            streetNumber: 'street-number-test',
+          },
+        ],
+      },
+    };
 
     const response = await axios.post(
       url,
       {
         query: createUserMutation,
+        variables,
       },
       {
         headers: { Authorization: `Bearer ${validToken}` },
@@ -156,26 +203,31 @@ describe('Create User Mutation', () => {
   });
 
   it('should return an error if the password is weak', async () => {
-    const createUserMutation = `#graphql
-      mutation {
-        createUser(data: {
-          name: "Existing User",
-          email: "existing@example.com",
-          password: "senha",
-          birthDate: "1990-01-01"
-        }) {
-          id
-          name
-          email
-          birthDate
-        }
-      }
-    `;
+    const variables = {
+      data: {
+        name: 'Test User',
+        email: 'testuser@example.com',
+        password: 'password',
+        birthDate: '1990-01-01',
+        addresses: [
+          {
+            cep: 'cep-test',
+            city: 'city-test',
+            complement: 'complement-test',
+            neighborhood: 'neighborhood-test',
+            state: 'state-test',
+            street: 'street-test',
+            streetNumber: 'street-number-test',
+          },
+        ],
+      },
+    };
 
     const response = await axios.post(
       url,
       {
         query: createUserMutation,
+        variables,
       },
       {
         headers: { Authorization: `Bearer ${validToken}` },

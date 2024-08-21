@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 import { generateToken } from '../utilits/verify-token.js';
+import { seed } from '../scripts/seeds.js';
 
 describe('User Query', () => {
   const prisma = new PrismaClient();
@@ -15,6 +16,16 @@ describe('User Query', () => {
         name
         email
         birthDate
+        addresses {
+          cep
+          city
+          complement
+          id
+          neighborhood
+          state
+          street
+          streetNumber
+        }
       }
     }
   `;
@@ -24,17 +35,10 @@ describe('User Query', () => {
   });
 
   it('should return user data for a valid ID', async () => {
-    const user = await prisma.user.create({
-      data: {
-        name: 'Existing User',
-        email: 'existing@example.com',
-        password: 'Test1234!',
-        birthDate: '1990-01-01',
-      },
-    });
+    const users = await seed(1);
 
     const variables = {
-      userId: user.id,
+      userId: Number(users[0].id),
     };
 
     const response = await axios.post(
@@ -44,15 +48,23 @@ describe('User Query', () => {
         headers: { Authorization: `Bearer ${validToken}` },
       },
     );
+    console.log(response.data.errors);
 
-    const expectedUser = {
-      id: user.id.toString(),
-      name: 'Existing User',
-      email: 'existing@example.com',
-      birthDate: '1990-01-01',
-    };
-    expect(response.data.data.user).to.have.property('id');
-    expect(response.data.data.user).to.deep.equal(expectedUser);
+    const expectedUser = users[0];
+    const user = response.data.data.user;
+    expect(user.id).to.equal(String(expectedUser.id));
+    expect(user.name).to.equal(expectedUser.name);
+    expect(user.email).to.equal(expectedUser.email);
+    expect(user.birthDate).to.equal(expectedUser.birthDate);
+    user.addresses.forEach((addresses, index) => {
+      expect(addresses.cep).to.equal(expectedUser.addresses[index].cep);
+      expect(addresses.city).to.equal(expectedUser.addresses[index].city);
+      expect(addresses.complement).to.equal(expectedUser.addresses[index].complement);
+      expect(addresses.neighborhood).to.equal(expectedUser.addresses[index].neighborhood);
+      expect(addresses.state).to.equal(expectedUser.addresses[index].state);
+      expect(addresses.street).to.equal(expectedUser.addresses[index].street);
+      expect(addresses.streetNumber).to.equal(expectedUser.addresses[index].streetNumber);
+    });
   });
 
   it('should return an error for an invalid ID', async () => {

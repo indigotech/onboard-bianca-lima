@@ -41,7 +41,7 @@ type User {
   name: String!
   email: String!
   birthDate: String!
-  addresses: [Address!]!
+  addresses: [Address!]
 }
 
 type LoginResponse {

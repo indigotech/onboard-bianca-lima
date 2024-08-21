@@ -13,4 +13,18 @@ model User {
   email     String  @unique
   password  String
   birthDate String
+  addresses Address[]
+}
+
+model Address {
+  id            Int    @id @default(autoincrement())
+  cep           String
+  street        String
+  streetNumber  String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  userId        Int
+  user          User   @relation(fields: [userId], references: [id])
 }

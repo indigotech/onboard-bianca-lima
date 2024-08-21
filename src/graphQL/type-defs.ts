@@ -5,6 +5,7 @@ input UserInput {
   email: String!
   password: String!
   birthDate: String!
+  addresses: [AddressInput!]
 }
 
 input LoginInput {
@@ -13,11 +14,34 @@ input LoginInput {
   rememberMe: Boolean
 }
 
+input AddressInput {
+  cep: String!
+  street: String!
+  streetNumber: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+}
+
+type Address {
+  id: ID!
+  cep: String!
+  street: String!
+  streetNumber: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+  user: User!
+}
+
 type User {
   id: ID!
   name: String!
   email: String!
   birthDate: String!
+  addresses: [Address!]!
 }
 
 type LoginResponse {

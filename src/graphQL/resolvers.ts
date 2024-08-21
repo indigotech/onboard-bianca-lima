@@ -15,35 +15,38 @@ const resolvers = {
 
       const user = await prisma.user.findUnique({
         where: { id: Number(id) },
+        include: { addresses: true },
       });
-
+    
       if (!user) {
         throw CustomError.userNotFound();
       }
       return user;
     },
+    
 
     users: async (parent, args: { skip: number; take: number }, context) => {
       await authenticateToken(context);
 
       const { skip = 0, take = 10 } = args;
-      const users = prisma.user.findMany({
+      const users = await prisma.user.findMany({
         skip,
         take,
         orderBy: {
           name: 'asc',
         },
+        include: { addresses: true },
       });
-
+    
       const totalUsers = await prisma.user.count();
-
+    
       return {
         users,
         totalUsers,
         hasMore: skip + take < totalUsers,
         hasPrevious: skip > 0,
       };
-    },
+    },    
   },
   Mutation: {
     createUser: async (parent, args, context) => {
@@ -69,6 +72,7 @@ const resolvers = {
           email: data.email,
           password: hashedPassword,
           birthDate: data.birthDate,
+          addresses: { create: data.addresses },
         },
       });
       return newUser;

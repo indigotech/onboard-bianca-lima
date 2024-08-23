@@ -1,5 +1,5 @@
 import { before, after } from 'mocha';
-import { startServer, stopServer } from '../server.js';
+import { startServer, stopServer } from '../api/config/server.js';
 
 let server;
 before(async () => {

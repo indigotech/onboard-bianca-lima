@@ -2,8 +2,8 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import { generateToken } from '../utilits/verify-token.js';
-import { seed } from '../scripts/seeds.js';
+import { generateToken } from '../utils/verify-token.js';
+import { seed } from '../data/seeds/seeds.js';
 
 const prisma = new PrismaClient();
 

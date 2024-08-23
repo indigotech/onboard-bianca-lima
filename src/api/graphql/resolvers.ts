@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { CustomError } from '../errors/custom-error.js';
-import { hashPassword, verifyPassword } from '../utilits/hash-password.js';
-import { authenticateToken, generateToken } from '../utilits/verify-token.js';
+import { CustomError } from '../../errors/custom-error.js';
+import { hashPassword, verifyPassword } from '../../utils/hash-password.js';
+import { authenticateToken, generateToken } from '../../utils/verify-token.js';
 
 const prisma = new PrismaClient();
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
